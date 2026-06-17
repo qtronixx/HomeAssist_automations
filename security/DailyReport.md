@@ -16,8 +16,8 @@
 
 ## 📁 Файлы
 
-- `security_daily_summary.yaml` — основная автоматизация
-- `sensor.yaml` — конфигурация command_line сенсора для сбора данных из Frigate
+- [`DailyReport.yaml`](DailyReport.yaml) — основная автоматизация
+- [`sensor.yaml`](#1-сенсор-уже-в-sensoryaml) — конфигурация command_line сенсора для сбора данных из Frigate
 
 ## 🤖 Как это работает
 
