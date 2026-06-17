@@ -25,9 +25,10 @@
 | `switch.kalitka_door_relay_0` | Реле управления калиткой | Конфигурация |
 | Telegram bot | Отправка уведомлений | Интеграция HA |
 
-## 📁 Файл
+## 📁 Файл автоматизации
 
-`Безопасность/Видеонаблюдение/frigate_otkrytie_kalitki.yaml`
+- [`faceDetectCalitkaOpen.yaml`](faceDetectCalitkaOpen.yaml) — основная автоматизация
+
 
 ## ⚙️ Логика работы
 
