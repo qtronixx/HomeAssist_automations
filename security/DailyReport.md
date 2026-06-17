@@ -17,7 +17,7 @@
 ## 📁 Файлы
 
 - [`DailyReport.yaml`](DailyReport.yaml) — основная автоматизация
-- [`sensor.yaml`](#1-сенсор-уже-в-sensoryaml) — конфигурация command_line сенсора для сбора данных из Frigate
+- [`sensor.yaml`](#1-сенсор-для-фригата-на-получение-данных) — конфигурация command_line сенсора для сбора данных из Frigate
 
 ## 🤖 Как это работает
 
@@ -48,17 +48,19 @@
 
 ## ⚙️ Настройка
 
-### 1. Сенсор (уже в `sensor.yaml`)
+### 1. Сенсор для фригата на получение данных
 ```yaml
 command_line:
   - sensor:
       name: Frigate Daily Report Data
       unique_id: frigate_daily_report_data
+      # description: Мы принудительно оборачиваем массив в объект с ключом "events" через jq
       command: >
         curl -s "http://xxx.xxx.xxx.xxx:5000/api/events?after={{ (as_timestamp(now()) - 86400) | int }}&limit=50" | 
         jq -c '{events: [.[] | select(.data != null and .data.description != null) | {camera: .camera, desc: .data.description}]}'
       scan_interval: 3600
       value_template: "{{ value_json.events | length }}"
+      # description: Теперь данные будут железно лежать в атрибуте "events"
       json_attributes:
         - events
 ```
