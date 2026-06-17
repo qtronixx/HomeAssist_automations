@@ -1,0 +1,36 @@
+alias: Security Daily Summary Professional
+triggers:
+  - at: "23:55:00"
+    trigger: time
+actions:
+  - action: homeassistant.update_entity
+    target:
+      entity_id: sensor.frigate_daily_report_data
+  - action: conversation.process
+    data:
+      agent_id: conversation.google_ai_conversation
+      text: >
+        Ты — начальник службы безопасности. Проанализируй логи событий ниже.
+
+        ВАЖНО: Если список событий пуст или написано "Движений не
+        зафиксировано", значит на участке была полная тишина. В этом случае так
+        и напиши: "За прошедшие сутки подозрительной активности не
+        зафиксировано. На участке всё спокойно."
+
+        События с камер за 24 часа: {% set data =
+        state_attr('sensor.frigate_daily_report_data', 'events') %} {% if data
+        is iterable and data | length > 0 %}
+          {% for event in data %}
+            - [{{ event.camera }}]: {{ event.desc }}
+          {% endfor %}
+        {% else %}
+          Движений не зафиксировано.
+        {% endif %}
+    response_variable: ai_response
+  - action: telegram_bot.send_message
+    data:
+      chat_id: -xxxxxxxxxx
+      parse_mode: html
+      message: |
+        <b>📊 ИТОГИ ЗА СУТКИ</b>
+        {{ ai_response.response.speech.plain.speech }}
