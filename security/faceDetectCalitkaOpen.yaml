@@ -1,0 +1,54 @@
+alias: Frigate - Автоматическое открытие калитки для известных персон
+description: |
+  Открывает калитку и отправляет уведомление при обнаружении известных персон с
+  точностью >90% (+ защита от повторного открытия)
+triggers:
+  - topic: frigate/tracked_object_update
+    trigger: mqtt
+conditions:
+  - condition: state
+    alias: Калитка должна быть закрыта минимум 20 секунд (защита от дребезга)
+    entity_id: binary_sensor.opensensor_kalitka_contact
+    state: "off"
+    for:
+      seconds: 20
+  - condition: template
+    alias: Проверка распознавания лица
+    value_template: >
+      {% set message = trigger.payload_json %} {% set allowed_persons =
+      ['Dmitry', 'Katy', 'Maxim', 'Pancho', 'Teshcha', 'Sanya', 'Kiseleva'] %}
+      {{ 
+        message.camera == 'doorbell' and
+        message.type == 'face' and
+        message.name in allowed_persons and
+        message.score >= 0.9
+      }}
+  - condition: template
+    alias: Проверка наличия снимка
+    value_template: "{{ trigger.payload_json.has_snapshot == true }}"
+  - condition: template
+    alias: Защита от частого срабатывания (раз в 2 минуты)
+    value_template: >-
+      {{ (as_timestamp(now()) - as_timestamp(this.attributes.last_triggered |
+      default(0))) > 120 }}
+actions:
+  - target:
+      entity_id: switch.kalitka_door_relay_0
+    action: switch.toggle
+  - parallel:
+      - data:
+          caption: >
+            🚪 Калитка автоматически открыта по распознаванию лица! {{
+            trigger.payload_json.name }} обнаружен(а) у калитки Точность: {{
+            (trigger.payload_json.score * 100) | round(2) }}% Время: {{
+            now().strftime('%H:%M:%S %d.%m.%Y') }}
+          url: >-
+            http://xxx.xxx.xxx.xxx:5000/api/events/{{ trigger.payload_json.id
+            }}/snapshot.jpg?crop=1&quality=95
+          disable_notification: false
+          config_entry_id: xxxxxxxxxxxxx
+          chat_id: -xxxxxxxxxxx
+        action: telegram_bot.send_photo
+  - delay:
+      seconds: 2
+mode: single
