@@ -2,6 +2,6 @@
 
 Управление всем тем что можно нагреть или охладить
 
-## [Smart Garden Shower Controller (ESPHome)](/qtronixx/shower-controller)
+## [Smart Garden Shower Controller (ESPHome)](https://github.com/qtronixx/shower-controller)
 Контроллер дачного душа на базе ESP32 с интеграцией в Home Assistant. 
 Репозиторий содержит конфигурацию для управления нагревом (ТЭН) и циркуляцией (Насос), с защитой от сухого хода и замерзания.
